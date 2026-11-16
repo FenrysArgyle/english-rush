@@ -1,0 +1,670 @@
+{
+  "specVersion": "1.0.1",
+  "approvalStatus": "approved",
+  "approvedScope": "english rush V1.0.1: robot chạy phố neon, trả lời 48 câu tiếng Anh THPT để nhảy; ba tim, combo, kỷ lục cục bộ và xếp hạng trực tuyến; máy tính ngang và điện thoại tự thích ứng; hiệu ứng tổng hợp và nhạc nền riêng cho ba trò chơi do người tạo cung cấp.",
+  "title": "english rush",
+  "description": "Giúp robot vượt tinh thể giữa phố neon bằng kiến thức Tiếng Anh THPT, nối combo và chinh phục kỷ lục.",
+  "renderMode": "canvas-2d",
+  "assetContractVersion": 2,
+  "gameType": "english-quiz-endless-runner",
+  "genre": [
+    "Endless runner học Tiếng Anh"
+  ],
+  "inGameLanguage": "vi",
+  "targetDeviceMode": "cross-device",
+  "targetDevices": [
+    {
+      "type": "desktop-browser",
+      "orientation": "landscape"
+    },
+    {
+      "type": "mobile",
+      "orientation": "adaptive"
+    }
+  ],
+  "visualDirection": "Robot thân thiện chạy ngang trong phố neon xanh tím, điểm nhấn cyan và magenta, nền parallax nhiều lớp; câu hỏi kính mờ, chữ rõ và hiệu ứng hạt khi nhảy.",
+  "playerFantasy": "Điều khiển khả năng vượt chướng ngại vật của robot bằng kiến thức Tiếng Anh.",
+  "objective": "Trả lời đúng càng nhiều càng tốt trước khi hết ba tim để phá kỷ lục.",
+  "coreLoop": "Tự chạy → đến chướng ngại vật → dừng đường chạy và trả lời → đúng thì nhảy, tăng điểm/combo; sai thì mất tim và đọc giải thích → tiếp tục hoặc kết quả → chơi lại.",
+  "controls": {
+    "answer": "Mouse/touch answer or keys 1–4 / A–D; consume exactly once per question.",
+    "start": "Click/tap Bắt đầu",
+    "continue": "Click/tap Tiếp tục after feedback if lives remain",
+    "restart": "Click/tap Chơi lại",
+    "mute": "Click/tap sound toggle"
+  },
+  "progression": "Tăng nhẹ tốc độ theo điểm; câu hỏi không lặp trong mỗi chu kỳ 48 câu. Không có màn thắng cuối.",
+  "failureState": "Kết thúc ở 0 tim; vẫn hiển thị đáp án đúng và giải thích cuối cùng.",
+  "presentationContract": {
+    "orientation": "adaptive",
+    "viewportMode": "adaptive",
+    "coordinateSpace": "world-2d",
+    "layoutAuthority": "data/config.json worldLayout owns groundY, player anchor, obstacle transforms and responsive question/HUD zones",
+    "logicalStage": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "worldLayout": {
+    "playfieldOwner": "runtime",
+    "groundY": 570,
+    "playerAnchor": {
+      "x": 245,
+      "y": 570
+    },
+    "groundDescription": "One continuous runtime-owned track; background has no playable ground. Track details and particles use the same groundY.",
+    "portraitLayout": "Compact stage above question card with four full-width answer buttons and HUD; fit full available width and height without scrolling."
+  },
+  "artDirection": {
+    "palette": [
+      "#101329",
+      "#30265c",
+      "#19e6ee",
+      "#f35ac8",
+      "#f4f5ff"
+    ],
+    "shapeLanguage": "Rounded friendly robot against faceted crystal obstacles and layered clean tower silhouettes",
+    "strokeLanguage": "Clean restrained dark outlines and thin luminous accents",
+    "lighting": "Cyan and magenta rim lights against indigo dusk; white character face remains readable",
+    "texture": "Smooth enamel robot, polished crystal facets and sparse neon window details",
+    "camera": "Orthographic side view, robot facing right, fixed ground reference",
+    "contrast": "Bright character and obstacle against muted background; opaque high-contrast text over glass cards",
+    "forbidden": [
+      "embedded text",
+      "photorealistic gore",
+      "square placeholder characters"
+    ]
+  },
+  "gameplayContract": {
+    "states": [
+      "ready",
+      "running",
+      "question",
+      "jumping",
+      "collision",
+      "feedback",
+      "gameover"
+    ],
+    "actions": [
+      "start",
+      "answer",
+      "continue",
+      "restart",
+      "toggleSound",
+      "run",
+      "jump",
+      "hit"
+    ],
+    "audioEvents": [
+      "jump",
+      "powerup",
+      "hit"
+    ],
+    "complexCharacterActions": [
+      {
+        "character": "robot",
+        "action": "run",
+        "role": "robot-run",
+        "kind": "loop",
+        "fps": 12,
+        "phases": [
+          {
+            "frame": "run-1",
+            "cue": "Left boot contacts ground, right arm forward"
+          },
+          {
+            "frame": "run-2",
+            "cue": "Body passes over planted left foot, right knee lifts"
+          },
+          {
+            "frame": "run-3",
+            "cue": "Right boot contacts ground, left arm forward"
+          },
+          {
+            "frame": "run-4",
+            "cue": "Body passes over right foot, left knee lifts; closes into first contact"
+          }
+        ]
+      },
+      {
+        "character": "robot",
+        "action": "jump",
+        "role": "robot-jump",
+        "kind": "sequence",
+        "fps": 8,
+        "phases": [
+          {
+            "frame": "jump-1",
+            "cue": "Crouch with bent knees preparing launch"
+          },
+          {
+            "frame": "jump-2",
+            "cue": "Push off, extend legs and lift both arms"
+          },
+          {
+            "frame": "jump-3",
+            "cue": "Tuck knees at airborne apex"
+          },
+          {
+            "frame": "jump-4",
+            "cue": "Extend boots to land with knees absorbing impact"
+          }
+        ]
+      },
+      {
+        "character": "robot",
+        "action": "hit",
+        "role": "robot-hit",
+        "kind": "sequence",
+        "fps": 8,
+        "phases": [
+          {
+            "frame": "hit-1",
+            "cue": "Leading boot catches crystal; torso recoils"
+          },
+          {
+            "frame": "hit-2",
+            "cue": "Arms flail and knees fold away from impact"
+          },
+          {
+            "frame": "hit-3",
+            "cue": "Robot stumbles with lowered head and bent legs"
+          },
+          {
+            "frame": "hit-4",
+            "cue": "Regain balanced stance ready to continue"
+          }
+        ]
+      }
+    ],
+    "mechanics": [
+      "Run automatically; trigger a question at a safe obstacle distance before contact. Freeze world movement and robot animation during question while real-time answer countdown continues.",
+      "Start with 3 lives. Each wrong answer or timeout removes exactly one life, sets combo to zero and plays collision once. Feedback shows correct answer plus Vietnamese explanation. Continue explicitly if lives remain; zero lives leads to gameover with same explanation.",
+      "Correct answer: hide question, play automatic jump over obstacle, increment combo, award 100 + min(100,20*(combo-1)) integer points. First correct answer gives 100. No points for distance or wrong answers.",
+      "Use 15 seconds per question, 20 seconds for long sentence structure items. Countdown uses elapsed seconds and is suspended when document is hidden to avoid unfair timeouts.",
+      "48 authored THPT questions, exactly 16 fill-in-the-blank, 16 sentence-structure, 16 meaning/idioms; each has 4 distinct options, exactly one correct id and Vietnamese explanation. Shuffle question bag and option ids, no repeats until all 48 used; avoid immediate cross-bag repetition.",
+      "Answer by 1–4 or A–D mapped to displayed positions; mouse and touch have identical results. Prevent key repeat and duplicate answers during transitions.",
+      "Base speed 260 logical units/second grows with score to a cap of 420; speed does not shorten question time. Jump collision bypass occurs only on a correct answer.",
+      "Gameover freezes finalScore as a nonnegative safe integer. Store personal best defensively in localStorage; failure of storage does not block play. Submit final result once to approved leaderboard; offline failure never blocks restart.",
+      "Restart resets points, lives, combo, question timer, animation, feedback and pending obstacle while preserving high score and mute preference.",
+      "SFX only: synthesize jump upward chirp, correct-answer two-note ting and collision low buzz with Web Audio. No BGM, voices or external MP3. Provide sound toggle and gesture-gated audio initialization."
+    ],
+    "proofFields": [
+      "state",
+      "score",
+      "lives",
+      "combo",
+      "questionId",
+      "questionCategory",
+      "answerOrder",
+      "timeRemaining",
+      "worldPaused",
+      "obstacleX",
+      "animationRole",
+      "animationState",
+      "animationFrame",
+      "highScore",
+      "finalScore",
+      "leaderboard"
+    ],
+    "acceptanceCriteria": [
+      "Ready shows objective, controls, three-life rule and Start; Start reliably begins the runner.",
+      "All four keyboard number/letter pairs, clicks and taps select the same visible answer positions and only one answer is accepted per question.",
+      "World and character stop for questions while timer counts down; correct answer visibly jumps the obstacle and awards exact combo score.",
+      "Wrong answer and timeout each remove exactly one life; feedback provides correct answer and Vietnamese explanation; continuation requires player action.",
+      "Third error reaches gameover with frozen finalScore, last correction, local best and retry. Retry starts a fresh round. Leaderboard service unavailable still permits every gameplay state.",
+      "Exactly 48 validated unique questions, 16 per category, four unique shuffled answers and one correct answer; 15/20 second limits follow question type.",
+      "Full stage, HUD, question, four choices and controls remain visible without scrolling at desktop landscape and mobile portrait/landscape. Use computePresentationFit with width and height on resize.",
+      "Exactly one opaque scenic background visible at any time. Parallax layers remain transparent and ground/obstacle visuals derive from authoritative worldLayout.",
+      "Each robot run/jump/hit action uses its exclusive sheet, correct state-selected frames, stable height and unstretched cells; inspect identity, articulation, foot contacts, recovery and run-loop closure.",
+      "Unavailable art uses declared readable animated fallbacks, not invisible actors. Audio is unlocked by gesture, muted reliably, synthesized per approved event and never plays BGM.",
+      "Leaderboard receives final safe integer once per gameover and never test scores; testMode suppresses writes and exposes truthful submission lifecycle."
+    ]
+  },
+  "leaderboard": {
+    "enabled": true,
+    "scoreLabel": "Điểm",
+    "submitStates": [
+      "gameover"
+    ]
+  },
+  "audioDirection": {
+    "enabled": true,
+    "bgmEnabled": true,
+    "selectionMode": "scene-v1",
+    "synthesisRequired": true,
+    "sceneBrief": {
+      "overall": "Educational arcade with creator-provided background music per game and preserved synthesized runner feedback.",
+      "events": {
+        "jump": {
+          "context": "Once on successful robot takeoff after a correct answer.",
+          "sound": "A quick synthesized rising pitch chirp, light and buoyant.",
+          "queryGroups": [
+            [
+              "jump",
+              "takeoff"
+            ],
+            [
+              "synthesized",
+              "electronic"
+            ]
+          ]
+        },
+        "powerup": {
+          "context": "Once when the selected answer is correct and points/combo increase.",
+          "sound": "Two clear synthesized bell-like notes, ting-ting, encouraging but unobtrusive.",
+          "queryGroups": [
+            [
+              "success",
+              "correct answer"
+            ],
+            [
+              "chime",
+              "bell"
+            ]
+          ]
+        },
+        "hit": {
+          "context": "Once when a wrong answer or timeout causes obstacle collision and loss of one life.",
+          "sound": "A short synthesized low-pitch buzz or impact, not harsh; distinct from success.",
+          "queryGroups": [
+            [
+              "collision",
+              "impact",
+              "hit"
+            ],
+            [
+              "electronic",
+              "synthesized"
+            ]
+          ]
+        }
+      },
+      "bgm": {
+        "context": "Music loops during the selected game and stops on returning to the menu.",
+        "sound": "Creator-selected tracks: Attack of the Killer Queen for runner, Tokyovania for Memory Match, Hajimari no Kyoku for Word Quest.",
+        "queryGroups": [
+          [
+            "background music"
+          ]
+        ]
+      }
+    }
+  },
+  "rasterArt": {
+    "briefVersion": 3,
+    "animationPlanningVersion": 2,
+    "characterRoles": [
+      "robot"
+    ],
+    "characterVisuals": [
+      {
+        "character": "robot",
+        "roleClass": "player",
+        "characterVisualMode": "animated",
+        "motionMode": "phase-animation",
+        "roles": [
+          "robot-run",
+          "robot-jump",
+          "robot-hit"
+        ],
+        "actionVisuals": [
+          {
+            "action": "run",
+            "role": "robot-run",
+            "treatment": "sprite-loop",
+            "phases": [
+              "run-1",
+              "run-2",
+              "run-3",
+              "run-4"
+            ]
+          },
+          {
+            "action": "jump",
+            "role": "robot-jump",
+            "treatment": "sprite-sequence",
+            "phases": [
+              "jump-1",
+              "jump-2",
+              "jump-3",
+              "jump-4"
+            ]
+          },
+          {
+            "action": "hit",
+            "role": "robot-hit",
+            "treatment": "sprite-sequence",
+            "phases": [
+              "hit-1",
+              "hit-2",
+              "hit-3",
+              "hit-4"
+            ]
+          }
+        ]
+      }
+    ],
+    "roles": [
+      {
+        "role": "robot-run",
+        "coverageGroup": "character",
+        "subject": "Compact friendly ivory robot, rounded helmet with dark navy visor and two cyan eyes, cyan chest core, magenta ear plates, short articulated limbs, three-finger hands, chunky boots, right-facing side view; consistent proportions and bottom-center foot anchor. Exclusive run action.",
+        "usage": "gameplay",
+        "profile": "sprite-sheet",
+        "layer": "world-main",
+        "alphaRequired": true,
+        "sheetGroup": "robot",
+        "identityLock": "Compact friendly ivory robot, rounded helmet with dark navy visor and two cyan eyes, cyan chest core, magenta ear plates, short articulated limbs, three-finger hands, chunky boots, right-facing side view; consistent proportions and bottom-center foot anchor.",
+        "materialName": "Neon Robot Run",
+        "materialDescription": "Friendly ivory robot with cyan visor eyes and magenta ear plates performing a readable run action in side view.",
+        "materialTags": [
+          "robot",
+          "neon",
+          "side-view"
+        ],
+        "reviewCategory": "character",
+        "fallback": {
+          "type": "procedural",
+          "description": "Draw rounded jointed robot with same colors and articulated run phases; preserve the action and feet anchor."
+        },
+        "animation": {
+          "layout": "2x2",
+          "frameWidth": 512,
+          "frameHeight": 576,
+          "anchor": "bottom-center",
+          "frames": [
+            "run-1",
+            "run-2",
+            "run-3",
+            "run-4"
+          ],
+          "phasePlan": [
+            {
+              "frame": "run-1",
+              "action": "run",
+              "cue": "Left boot contacts ground, right arm forward"
+            },
+            {
+              "frame": "run-2",
+              "action": "run",
+              "cue": "Body passes over planted left foot, right knee lifts"
+            },
+            {
+              "frame": "run-3",
+              "action": "run",
+              "cue": "Right boot contacts ground, left arm forward"
+            },
+            {
+              "frame": "run-4",
+              "action": "run",
+              "cue": "Body passes over right foot, left knee lifts; closes into first contact"
+            }
+          ],
+          "loopClip": {
+            "name": "run",
+            "indices": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "fps": 12,
+            "loop": true
+          }
+        }
+      },
+      {
+        "role": "robot-jump",
+        "coverageGroup": "character",
+        "subject": "Compact friendly ivory robot, rounded helmet with dark navy visor and two cyan eyes, cyan chest core, magenta ear plates, short articulated limbs, three-finger hands, chunky boots, right-facing side view; consistent proportions and bottom-center foot anchor. Exclusive jump action.",
+        "usage": "gameplay",
+        "profile": "sprite-sheet",
+        "layer": "world-main",
+        "alphaRequired": true,
+        "sheetGroup": "robot",
+        "identityLock": "Compact friendly ivory robot, rounded helmet with dark navy visor and two cyan eyes, cyan chest core, magenta ear plates, short articulated limbs, three-finger hands, chunky boots, right-facing side view; consistent proportions and bottom-center foot anchor.",
+        "materialName": "Neon Robot Jump",
+        "materialDescription": "Friendly ivory robot with cyan visor eyes and magenta ear plates performing a readable jump action in side view.",
+        "materialTags": [
+          "robot",
+          "neon",
+          "side-view"
+        ],
+        "reviewCategory": "character",
+        "fallback": {
+          "type": "procedural",
+          "description": "Draw rounded jointed robot with same colors and articulated jump phases; preserve the action and feet anchor."
+        },
+        "animation": {
+          "layout": "2x2",
+          "frameWidth": 512,
+          "frameHeight": 576,
+          "anchor": "bottom-center",
+          "frames": [
+            "jump-1",
+            "jump-2",
+            "jump-3",
+            "jump-4"
+          ],
+          "phasePlan": [
+            {
+              "frame": "jump-1",
+              "action": "jump",
+              "cue": "Crouch with bent knees preparing launch"
+            },
+            {
+              "frame": "jump-2",
+              "action": "jump",
+              "cue": "Push off, extend legs and lift both arms"
+            },
+            {
+              "frame": "jump-3",
+              "action": "jump",
+              "cue": "Tuck knees at airborne apex"
+            },
+            {
+              "frame": "jump-4",
+              "action": "jump",
+              "cue": "Extend boots to land with knees absorbing impact"
+            }
+          ],
+          "units": [
+            {
+              "type": "sequence",
+              "name": "jump",
+              "indices": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "fps": 8
+            }
+          ]
+        }
+      },
+      {
+        "role": "robot-hit",
+        "coverageGroup": "character",
+        "subject": "Compact friendly ivory robot, rounded helmet with dark navy visor and two cyan eyes, cyan chest core, magenta ear plates, short articulated limbs, three-finger hands, chunky boots, right-facing side view; consistent proportions and bottom-center foot anchor. Exclusive hit action.",
+        "usage": "gameplay",
+        "profile": "sprite-sheet",
+        "layer": "world-main",
+        "alphaRequired": true,
+        "sheetGroup": "robot",
+        "identityLock": "Compact friendly ivory robot, rounded helmet with dark navy visor and two cyan eyes, cyan chest core, magenta ear plates, short articulated limbs, three-finger hands, chunky boots, right-facing side view; consistent proportions and bottom-center foot anchor.",
+        "materialName": "Neon Robot Hit",
+        "materialDescription": "Friendly ivory robot with cyan visor eyes and magenta ear plates performing a readable hit action in side view.",
+        "materialTags": [
+          "robot",
+          "neon",
+          "side-view"
+        ],
+        "reviewCategory": "character",
+        "fallback": {
+          "type": "procedural",
+          "description": "Draw rounded jointed robot with same colors and articulated hit phases; preserve the action and feet anchor."
+        },
+        "animation": {
+          "layout": "2x2",
+          "frameWidth": 512,
+          "frameHeight": 576,
+          "anchor": "bottom-center",
+          "frames": [
+            "hit-1",
+            "hit-2",
+            "hit-3",
+            "hit-4"
+          ],
+          "phasePlan": [
+            {
+              "frame": "hit-1",
+              "action": "hit",
+              "cue": "Leading boot catches crystal; torso recoils"
+            },
+            {
+              "frame": "hit-2",
+              "action": "hit",
+              "cue": "Arms flail and knees fold away from impact"
+            },
+            {
+              "frame": "hit-3",
+              "action": "hit",
+              "cue": "Robot stumbles with lowered head and bent legs"
+            },
+            {
+              "frame": "hit-4",
+              "action": "hit",
+              "cue": "Regain balanced stance ready to continue"
+            }
+          ],
+          "units": [
+            {
+              "type": "sequence",
+              "name": "hit",
+              "indices": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "fps": 8
+            }
+          ]
+        }
+      },
+      {
+        "role": "neon-skyline",
+        "coverageGroup": "environment",
+        "subject": "Groundless cyberpunk dusk sky with distant indigo towers, violet atmospheric haze and small cyan windows, no floor, no lettering. The sole opaque scenic backdrop.",
+        "usage": "background",
+        "profile": "wide-background",
+        "layer": "background",
+        "alphaRequired": false,
+        "materialName": "Neon Dusk Skyline",
+        "materialDescription": "Groundless layered distant cyberpunk city skyline under an indigo and purple dusk sky.",
+        "materialTags": [
+          "city",
+          "cyberpunk",
+          "skyline"
+        ],
+        "reviewCategory": "environment",
+        "fallback": {
+          "type": "procedural",
+          "description": "One gradient dusk sky with distant rounded skyline silhouettes, no second background."
+        }
+      },
+      {
+        "role": "near-city",
+        "coverageGroup": "environment",
+        "subject": "Transparent strip of middle-distance neon building silhouettes with cyan and magenta windows, no sky and no ground; repeating parallax layer.",
+        "usage": "decorative",
+        "profile": "wide-background",
+        "layer": "world-back",
+        "alphaRequired": true,
+        "materialName": "Neon City Parallax Buildings",
+        "materialDescription": "Transparent city building silhouettes with cyan and magenta windows for a scrolling middle-distance layer.",
+        "materialTags": [
+          "buildings",
+          "neon",
+          "city"
+        ],
+        "reviewCategory": "environment",
+        "fallback": {
+          "type": "procedural",
+          "description": "Sparse translucent building silhouettes scrolling slower than the track."
+        }
+      },
+      {
+        "role": "energy-crystal",
+        "coverageGroup": "prop",
+        "subject": "Low jagged cluster of luminous magenta energy crystals with cyan rim light, clear pointed silhouette, side view; robot jumps over it.",
+        "usage": "gameplay",
+        "profile": "sprite",
+        "layer": "world-main",
+        "alphaRequired": true,
+        "materialName": "Magenta Energy Crystal Obstacle",
+        "materialDescription": "Jagged magenta crystal cluster with cyan rim lighting, readable as a low jumping obstacle.",
+        "materialTags": [
+          "crystal",
+          "neon",
+          "obstacle"
+        ],
+        "reviewCategory": "prop",
+        "fallback": {
+          "type": "procedural",
+          "description": "Draw faceted magenta crystal cluster matching authoritative obstacle bounds; never a plain box."
+        }
+      }
+    ]
+  },
+  "accessibilityNotes": [
+    "Vietnamese UI and explanations, English learning prompts; support Vietnamese diacritics.",
+    "Readable contrast, touch targets at least 44 CSS pixels, no color-only correctness cues.",
+    "Reduced motion disables camera shake and reduces particles without removing required action poses."
+  ],
+  "mvpScope": {
+    "included": [
+      "48 câu hỏi",
+      "ba tim",
+      "combo",
+      "parallax",
+      "bảng xếp hạng",
+      "kỷ lục thiết bị",
+      "hiệu ứng âm thanh tổng hợp",
+      "nhạc nền riêng cho từng trò chơi"
+    ],
+    "excluded": [
+      "tài khoản",
+      "cửa hàng",
+      "nhiều nhân vật",
+      "nhiều người chơi"
+    ]
+  },
+  "requiredRasterRoles": [
+    "robot-run",
+    "robot-jump",
+    "robot-hit",
+    "neon-skyline",
+    "near-city",
+    "energy-crystal"
+  ],
+  "approvedRasterCoverage": {
+    "groups": [
+      {
+        "name": "character",
+        "count": 3
+      },
+      {
+        "name": "environment",
+        "count": 2
+      },
+      {
+        "name": "prop",
+        "count": 1
+      }
+    ],
+    "total": 6
+  }
+}

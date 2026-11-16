@@ -1,0 +1,88 @@
+{
+  "visuals": [
+    "data/game-spec.json",
+    "data/assets.json",
+    "scripts/renderer.js"
+  ],
+  "gameplayTuning": [
+    "data/config.json",
+    "scripts/gameplay.js"
+  ],
+  "assets": [
+    "data/assets.json"
+  ],
+  "uiCopy": [
+    "data/config.json",
+    "scripts/renderer.js"
+  ],
+  "sourceModules": {
+    "state": [
+      "scripts/core.js"
+    ],
+    "controls": [
+      "scripts/input.js"
+    ],
+    "audio": [
+      "scripts/audio.js"
+    ],
+    "rendering": [
+      "scripts/renderer.js"
+    ],
+    "gameplay": [
+      "scripts/gameplay.js"
+    ],
+    "testing": [
+      "scripts/test-hook.js"
+    ],
+    "startup": [
+      "scripts/game.js"
+    ],
+    "ui": [
+      "scripts/ui.js"
+    ]
+  },
+  "importantObjects": [
+    "worldLayout",
+    "gameplayContract",
+    "rasterArt",
+    "audioDirection",
+    "leaderboard"
+  ],
+  "exposedGlobals": [
+    "window.GAME_CONFIG",
+    "window.GAME_ASSETS",
+    "window.SoonLabGame"
+  ],
+  "safeEdits": [
+    "Sửa câu hỏi, đáp án và giải thích trong nguồn dữ liệu, giữ đúng một đáp án đúng.",
+    "Điều chỉnh nội dung giao diện tiếng Việt và giá trị cân bằng trong phạm vi đã duyệt."
+  ],
+  "riskyEdits": [
+    "Không thay đổi đặc tả đã duyệt, tên vai trò hình ảnh, ánh xạ hoạt ảnh hoặc công thức điểm nếu chưa duyệt lại.",
+    "Không thay bảng xếp hạng, định danh trò chơi, cầu nối chủ nhà hoặc nguồn mô-đun bằng dịch vụ khác."
+  ],
+  "notes": "Các đường dẫn mô-đun và dữ liệu là tuyến chỉnh sửa chuẩn để các bước xây dựng tiếp theo tạo ra; chưa phải danh sách tệp đã triển khai.",
+  "editableAssetIds": [
+    "near-city",
+    "energy-crystal",
+    "robot-run",
+    "neon-skyline",
+    "robot-jump",
+    "robot-hit"
+  ],
+  "editableConfigKeys": [
+    "worldLayout",
+    "characterScale",
+    "character",
+    "controls",
+    "difficulty",
+    "progression",
+    "scoring",
+    "gameplay",
+    "questions",
+    "accessibility",
+    "effects",
+    "persistence",
+    "ui"
+  ]
+}
